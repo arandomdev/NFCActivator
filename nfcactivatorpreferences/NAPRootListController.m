@@ -53,7 +53,7 @@
 	cell.accessoryType = UITableViewCellAccessoryDetailButton;
 	return cell;
 }
-- (NSInteger)numberOfRowsInSection:(NSInteger)section {
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
 	HBLogDebug(@"called number of rows");
 	return self.eventEntrys.count;
 }
