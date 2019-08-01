@@ -1,9 +1,13 @@
+#import <Cephei/HBPreferences.h>
+#import "NAPRootListController.h"
+
 @interface NAPEntryEditController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 @property (nonatomic, retain) UITableView *tableView;
 @property (nonatomic, retain) NSString *eventName;
 @property (nonatomic, retain) NSDictionary *eventEntry;
 @property (nonatomic, retain) UITextField *nameInput;
 @property (nonatomic, retain) UITextField *descriptionInput;
+@property (nonatomic, retain) NAPRootListController *delegate;
 - (id)initWithName:(NSString *)name entry:(NSDictionary *)entry;
 - (void)viewDidLoad;
 - (void)cancelButtonPressed;

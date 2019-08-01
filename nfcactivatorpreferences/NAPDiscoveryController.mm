@@ -24,11 +24,13 @@ void detectedTags(CFNotificationCenterRef center, void *observer, CFStringRef na
 @implementation NAPDiscoveryController
 - (void)viewDidLoad {
     [super viewDidLoad];
-
+    self.view.backgroundColor = [UIColor whiteColor];
+    
     UILabel *textLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 200, 200)];
     textLabel.text = @"Scan Now";
     textLabel.textAlignment = NSTextAlignmentCenter;
     textLabel.center = self.view.center;
+    [self.view addSubview:textLabel];
 
     CFNotificationCenterRef center = CFNotificationCenterGetDistributedCenter();
 	CFNotificationCenterAddObserver(center, (__bridge void *)self, detectedTags, CFSTR("nfcbackground.newtag"), NULL, CFNotificationSuspensionBehaviorDeliverImmediately);

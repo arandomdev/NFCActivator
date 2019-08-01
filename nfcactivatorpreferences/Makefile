@@ -12,6 +12,7 @@ NFCActivatorPreferences_FRAMEWORKS = UIKit
 NFCActivatorPreferences_PRIVATE_FRAMEWORKS = Preferences AppSupport
 NFCActivatorPreferences_CFLAGS = -fobjc-arc
 NFCActivatorPreferences_LIBRARIES = rocketbootstrap
+NFCActivatorPreferences_EXTRA_FRAMEWORKS = Cephei
 
 include $(THEOS_MAKE_PATH)/bundle.mk
 

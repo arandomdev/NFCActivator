@@ -1,5 +1,6 @@
 #import <AppSupport/CPDistributedMessagingCenter.h>
 #import <rocketbootstrap/rocketbootstrap.h>
+#import <Cephei/HBPreferences.h>
 #import "ActivatorEntry.h"
 
 @interface SpringBoard
@@ -18,17 +19,17 @@
 
 @interface SBApplicationController
 +(id)sharedInstance;
++(id)sharedInstanceIfExists;
 -(SBApplication *)applicationWithBundleIdentifier:(NSString *)arg1;
 @end
 
 extern "C" CFNotificationCenterRef CFNotificationCenterGetDistributedCenter(void);
 
-void detectedTags(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef data) {
+void nfcActivatorDetectedTags(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef data) {
 	NSDictionary *userInfo = (__bridge NSDictionary *)data;
 	NSString *uid = userInfo[@"data"][0][@"uid"];
 
-	SBApplication *settingsApp = [[%c(SBApplicationController) sharedInstance] applicationWithBundleIdentifier:@"com.apple.Preferences"];
-	NSDictionary *entrys = [[[settingsApp info] userDefaults] objectForKey:@"NFCActivatorEntrys"];
+	NSDictionary *entrys = [[[HBPreferences alloc] initWithIdentifier:@"com.haotestlabs.nfcactivator"] objectForKey:@"NFCActivatorEntrys"];
 	if (!entrys) {
 		return;
 	}
@@ -45,9 +46,8 @@ void detectedTags(CFNotificationCenterRef center, void *observer, CFStringRef na
 %property (nonatomic, retain) NSArray *registeredEventNames;
 - (id)init {
 	id orig = %orig;
-
-	SBApplication *settingsApp = [[%c(SBApplicationController) sharedInstance] applicationWithBundleIdentifier:@"com.apple.Preferences"];
-	NSDictionary *entrys = [[[settingsApp info] userDefaults] objectForKey:@"NFCActivatorEntrys"];
+	
+	NSDictionary *entrys = [[[HBPreferences alloc] initWithIdentifier:@"com.haotestlabs.nfcactivator"] objectForKey:@"NFCActivatorEntrys"];
 	NSMutableArray *eventNames = [NSMutableArray new];
 	if (entrys) {
 		for (NSString *name in entrys) {
@@ -59,14 +59,14 @@ void detectedTags(CFNotificationCenterRef center, void *observer, CFStringRef na
 		}
 	}
 	self.registeredEventNames = [eventNames copy];
-
+	
 	CPDistributedMessagingCenter * messagingCenter = [CPDistributedMessagingCenter centerNamed:@"com.haotestlabs.nfcactivator"];
 	rocketbootstrap_distributedmessagingcenter_apply(messagingCenter);
 	[messagingCenter runServerOnCurrentThread];
-	[messagingCenter registerForMessageName:@"reregister" target:self selector:@selector(reregisterCommandForName:)];
+	[messagingCenter registerForMessageName:@"reregister" target:orig selector:@selector(reregisterCommandForName:)];
 	
 	CFNotificationCenterRef center = CFNotificationCenterGetDistributedCenter();
-	CFNotificationCenterAddObserver(center, (__bridge void *)orig, detectedTags, CFSTR("nfcbackground.newtag"), NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
+	CFNotificationCenterAddObserver(center, NULL, nfcActivatorDetectedTags, CFSTR("nfcbackground.newtag"), NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
 	return orig;
 }
 
@@ -76,8 +76,7 @@ void detectedTags(CFNotificationCenterRef center, void *observer, CFStringRef na
 		[LASharedActivator unregisterEventDataSourceWithEventName:eventName];
 	}
 
-	SBApplication *settingsApp = [[%c(SBApplicationController) sharedInstance] applicationWithBundleIdentifier:@"com.apple.Preferences"];
-	NSDictionary *entrys = [[[settingsApp info] userDefaults] objectForKey:@"NFCActivatorEntrys"];
+	NSDictionary *entrys = [[[HBPreferences alloc] initWithIdentifier:@"com.haotestlabs.nfcactivator"] objectForKey:@"NFCActivatorEntrys"];
 	NSMutableArray *eventNames = [NSMutableArray new];
 	if (entrys) {
 		for (NSString *name in entrys) {

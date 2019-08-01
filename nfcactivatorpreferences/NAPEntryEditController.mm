@@ -1,5 +1,6 @@
 #import <rocketbootstrap/rocketbootstrap.h>
 #import <AppSupport/CPDistributedMessagingCenter.h>
+#import <Cephei/HBPreferences.h>
 #import "NAPEntryEditController.h"
 #import "NAPDiscoveryController.h"
 
@@ -43,30 +44,32 @@
         [self.descriptionInput becomeFirstResponder];
         return;
     }
-
+    HBPreferences *preferences = [[HBPreferences alloc] initWithIdentifier:@"com.haotestlabs.nfcactivator"];
     if (!self.eventName) {
         NSString *uniqueName = [@"com.haotestlabs.nfcactivator." stringByAppendingString:[[NSProcessInfo processInfo] globallyUniqueString]];
         NSDictionary *newEntry = @{@"description" : self.descriptionInput.text, @"eventName" : uniqueName, @"tags" : self.eventEntry[@"tags"]};
 
-        NSDictionary *entrys = [[NSUserDefaults standardUserDefaults] objectForKey:@"NFCActivatorEntrys"];
+        NSDictionary *entrys = [preferences objectForKey:@"NFCActivatorEntrys"];
         NSMutableDictionary *updatedEntrys = [entrys mutableCopy];
         [updatedEntrys setObject:newEntry forKey:self.nameInput.text];
-        [[NSUserDefaults standardUserDefaults] setObject:updatedEntrys forKey:@"NFCActivatorEntrys"];
+        [preferences setObject:updatedEntrys forKey:@"NFCActivatorEntrys"];
     }
     else {
-        NSDictionary *entrys = [[NSUserDefaults standardUserDefaults] objectForKey:@"NFCActivatorEntrys"];
+        NSDictionary *entrys = [preferences objectForKey:@"NFCActivatorEntrys"];
         NSMutableDictionary *updatedEntrys = [entrys mutableCopy];
         [updatedEntrys removeObjectForKey:self.eventName];
 
         NSString *uniqueName = [@"com.haotestlabs.nfcactivator." stringByAppendingString:[[NSProcessInfo processInfo] globallyUniqueString]];
         NSDictionary *newEntry = @{@"description" : self.descriptionInput.text, @"eventName" : uniqueName, @"tags" : self.eventEntry[@"tags"]};
         [updatedEntrys setObject:newEntry forKey:self.nameInput.text];
-        [[NSUserDefaults standardUserDefaults] setObject:updatedEntrys forKey:@"NFCActivatorEntrys"];
+        [preferences setObject:updatedEntrys forKey:@"NFCActivatorEntrys"];
     }
     CPDistributedMessagingCenter *messagingCenter;
     messagingCenter = [CPDistributedMessagingCenter centerNamed:@"com.haotestlabs.nfcactivator"];
     rocketbootstrap_distributedmessagingcenter_apply(messagingCenter);
     [messagingCenter sendMessageName:@"reregister" userInfo:nil];
+
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 # pragma mark UITableViewDataSource
@@ -183,10 +186,11 @@
         UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Delete Event" message:@"Are you sure that you want to delete this event?" preferredStyle:UIAlertControllerStyleAlert];
         UIAlertAction *deleteAction = [UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
             if (self.eventName) {
-                NSDictionary *entrys = [[NSUserDefaults standardUserDefaults] objectForKey:@"NFCActivatorEntrys"];
+                HBPreferences *preferences = [[HBPreferences alloc] initWithIdentifier:@"com.haotestlabs.nfcactivator"];
+                NSDictionary *entrys = [preferences objectForKey:@"NFCActivatorEntrys"];
                 NSMutableDictionary *updatedEntrys = [entrys mutableCopy];
                 [updatedEntrys removeObjectForKey:self.eventName];
-                [[NSUserDefaults standardUserDefaults] setObject:updatedEntrys forKey:@"NFCActivatorEntrys"];
+                [preferences setObject:updatedEntrys forKey:@"NFCActivatorEntrys"];
                 
                 CPDistributedMessagingCenter *messagingCenter;
                 messagingCenter = [CPDistributedMessagingCenter centerNamed:@"com.haotestlabs.nfcactivator"];

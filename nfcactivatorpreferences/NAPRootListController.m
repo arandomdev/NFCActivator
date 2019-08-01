@@ -1,4 +1,6 @@
+#import <Cephei/HBPreferences.h>
 #include "NAPRootListController.h"
+#import "NAPEntryEditController.h"
 
 @implementation NAPRootListController
 - (NSArray *)specifiers {
@@ -14,7 +16,7 @@
 }
 
 - (void)viewDidLoad {
-	self.userDefaults = [NSUserDefaults standardUserDefaults];
+	self.userDefaults = [[HBPreferences alloc] initWithIdentifier:@"com.haotestlabs.nfcactivator"];;
 	if (!self.eventEntrys) {
 		[self.userDefaults setObject:[NSDictionary new] forKey:@"NFCActivatorEntrys"];
 	}
@@ -26,7 +28,8 @@
 }
 
 - (void)addButtonPressed {
-	// implement this
+	NAPEntryEditController *editController = [[NAPEntryEditController alloc] initWithName:nil entry:nil];
+	[self.navigationController pushViewController:editController animated:YES];
 }
 
 # pragma mark UITableViewDataSource
@@ -38,6 +41,7 @@
 	return 1;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+	HBLogDebug(@"called cell");
 	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"NFCActivatorEntryCells"];
 	if (!cell) {
 		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"NFCActivatorEntryCells"];
@@ -50,6 +54,7 @@
 	return cell;
 }
 - (NSInteger)numberOfRowsInSection:(NSInteger)section {
+	HBLogDebug(@"called number of rows");
 	return self.eventEntrys.count;
 }
 
@@ -58,6 +63,10 @@
 	[tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 - (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath {
-	//implement this
+	NSArray *entryKeys = [[self.eventEntrys allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
+	NSString *name = entryKeys[indexPath.row];
+	NSDictionary *entry = self.eventEntrys[name];
+	NAPEntryEditController *editController = [[NAPEntryEditController alloc] initWithName:name entry:entry];
+	[self.navigationController pushViewController:editController animated:YES];
 }
 @end

@@ -10,6 +10,7 @@ NFCActivator_FILES = Tweak.xm activatorEntry.mm
 NFCActivator_CFLAGS = -fobjc-arc
 NFCActivator_LIBRARIES = activator rocketbootstrap
 NFCActivator_PRIVATE_FRAMEWORKS = AppSupport
+NFCActivator_EXTRA_FRAMEWORKS = Cephei
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 

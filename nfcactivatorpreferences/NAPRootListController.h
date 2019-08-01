@@ -1,7 +1,7 @@
 #import <Preferences/PSListController.h>
 
 @interface NAPRootListController : PSListController
-@property (nonatomic, retain) NSUserDefaults *userDefaults;
+@property (nonatomic, retain) HBPreferences *userDefaults;
 @property (readonly) NSDictionary *eventEntrys;
 - (NSArray *)specifiers;
 - (NSDictionary *)eventEntrys;
