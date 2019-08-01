@@ -1,0 +1,20 @@
+THEOS_DEVICE_IP = haotestlabs.com
+THEOS_DEVICE_PORT = 28262
+
+ARCHS = arm64
+
+include $(THEOS)/makefiles/common.mk
+
+BUNDLE_NAME = NFCActivatorPreferences
+NFCActivatorPreferences_FILES = NAPRootListController.m NAPEntryEditController.mm NAPDiscoveryController.mm
+NFCActivatorPreferences_INSTALL_PATH = /Library/PreferenceBundles
+NFCActivatorPreferences_FRAMEWORKS = UIKit
+NFCActivatorPreferences_PRIVATE_FRAMEWORKS = Preferences AppSupport
+NFCActivatorPreferences_CFLAGS = -fobjc-arc
+NFCActivatorPreferences_LIBRARIES = rocketbootstrap
+
+include $(THEOS_MAKE_PATH)/bundle.mk
+
+internal-stage::
+	$(ECHO_NOTHING)mkdir -p $(THEOS_STAGING_DIR)/Library/PreferenceLoader/Preferences$(ECHO_END)
+	$(ECHO_NOTHING)cp entry.plist $(THEOS_STAGING_DIR)/Library/PreferenceLoader/Preferences/NFCActivatorPreferences.plist$(ECHO_END)

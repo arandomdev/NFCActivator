@@ -1,0 +1,9 @@
+Package: com.haotestlabs.nfcactivator
+Name: NFCActivator
+Depends: mobilesubstrate
+Version: 0.0.1
+Architecture: iphoneos-arm
+Description: An awesome MobileSubstrate tweak!
+Maintainer: ArandomDev <haow6449@gmail.com
+Author: ArandomDev <haow6449@gmail.com
+Section: Tweaks
