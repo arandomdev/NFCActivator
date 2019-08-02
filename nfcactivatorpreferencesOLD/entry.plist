@@ -15,7 +15,7 @@
 		<key>isController</key>
 		<true/>
 		<key>label</key>
-		<string>NFCActivator</string>
+		<string>NFCActivatorPreferences</string>
 	</dict>
 </dict>
 </plist>
