@@ -6,11 +6,12 @@ ARCHS = arm64
 include $(THEOS)/makefiles/common.mk
 
 BUNDLE_NAME = NFCActivatorPreferences
-NFCActivatorPreferences_FILES = NAPRootListController.m
+NFCActivatorPreferences_FILES = NAPRootViewController.m NAPEditViewController.mm NAPDiscoveryViewController.mm
 NFCActivatorPreferences_INSTALL_PATH = /Library/PreferenceBundles
 NFCActivatorPreferences_FRAMEWORKS = UIKit
 NFCActivatorPreferences_PRIVATE_FRAMEWORKS = Preferences
 NFCActivatorPreferences_CFLAGS = -fobjc-arc
+NFCActivatorPreferences_EXTRA_FRAMEWORKS = Cephei
 
 include $(THEOS_MAKE_PATH)/bundle.mk
 
