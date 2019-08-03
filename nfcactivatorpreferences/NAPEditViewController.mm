@@ -11,7 +11,7 @@
             self.isNewEntry = NO;
         }
         else {
-            self.entry = @{@"tags" : [NSArray new]};
+            self.entry = [@{@"tags" : [NSArray new]} mutableCopy];
             self.isNewEntry = YES;
         }
     }
@@ -23,6 +23,8 @@
 
     self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStyleGrouped];
     self.tableView.dataSource = self;
+    self.tableView.delegate = self;
+
     [self.view addSubview:self.tableView];
 
     UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(doneButtonPressed)];
@@ -57,7 +59,7 @@
         NSString *eventName = self.entry[@"name"];
         for (int i = 0; i < entrys.count; i++) {
             if ([entrys[i][@"name"] isEqual:eventName]) {
-                NSMutableDictionary *updatedEntrys = [entrys mutableCopy];
+                NSMutableArray *updatedEntrys = [entrys mutableCopy];
                 [updatedEntrys removeObjectAtIndex:i];
                 [updatedEntrys addObject:[self.entry copy]];
 
@@ -67,7 +69,9 @@
         }
     }
 
-    // TODO: send notification
+    CFNotificationCenterRef center = CFNotificationCenterGetDarwinNotifyCenter();
+	CFNotificationCenterPostNotification(center, CFSTR("com.haotestlabs.nfcactivator.reload"), NULL, NULL, TRUE);
+
     [self.navigationController popViewControllerAnimated:YES];
     if (self.delegate) {
         [self.delegate viewDismissed];
@@ -106,30 +110,36 @@
     if (indexPath.section == 0) {
         if (!self.titleTextField) {
             UITextField *titleInput = [[UITextField alloc] initWithFrame:cell.contentView.bounds];
+            titleInput.center = CGPointMake(titleInput.center.x + 15, titleInput.center.y);
+
             titleInput.textAlignment = NSTextAlignmentLeft;
             titleInput.placeholder = @"Title Of Event";
-            titleInput.clearButtonMode = UITextFieldViewModeWhileEditing;
+            titleInput.clearButtonMode = UITextFieldViewModeNever;
             titleInput.autocapitalizationType = UITextAutocapitalizationTypeWords;
             titleInput.autocorrectionType = UITextAutocorrectionTypeNo;
             titleInput.delegate = self;
             if (!self.isNewEntry) {
                 titleInput.text = self.entry[@"title"];
             }
+            self.titleTextField = titleInput;
         }
         [cell.contentView addSubview:self.titleTextField];
     }
     else if (indexPath.section == 1) {
         if (!self.descriptionTextField) {
             UITextField *descriptionInput = [[UITextField alloc] initWithFrame:cell.contentView.bounds];
+            descriptionInput.center = CGPointMake(descriptionInput.center.x + 15, descriptionInput.center.y);
+
             descriptionInput.textAlignment = NSTextAlignmentLeft;
             descriptionInput.placeholder = @"Description of event";
-            descriptionInput.clearButtonMode = UITextFieldViewModeWhileEditing;
+            descriptionInput.clearButtonMode = UITextFieldViewModeNever;
             descriptionInput.autocapitalizationType = UITextAutocapitalizationTypeSentences;
-            descriptionInput.autocorrectionType = UITextAutocorrectionTypeYes
+            descriptionInput.autocorrectionType = UITextAutocorrectionTypeYes;
             descriptionInput.delegate = self;
             if (!self.isNewEntry) {
                 descriptionInput.text = self.entry[@"description"];
             }
+            self.descriptionTextField = descriptionInput;
         }
         [cell.contentView addSubview:self.descriptionTextField];
     }
@@ -139,11 +149,14 @@
     }
     else if (indexPath.section == 3) {
         cell.textLabel.text = self.entry[@"tags"][indexPath.row];
+        cell.textLabel.textColor = [UIColor blackColor];
     }
     else if (indexPath.section == 4) {
         cell.textLabel.text = @"Delete";
-        cell.textLabel.textColor = [[UIColor alloc] initWithRed:1 green:0.231 blue:188 alpha:1];
+        cell.textLabel.textColor = [[UIColor alloc] initWithRed:1 green:0.231 blue:0.188 alpha:1];
     }
+
+    return cell;
 }
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     if (self.isNewEntry) {
@@ -155,10 +168,18 @@
 }
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if (section == 3) {
-        return self.entry[@"tags"].count;
+        return [self.entry[@"tags"] count];
     }
     else {
         return 1;
+    }
+}
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.section == 3) {
+        return YES;
+    }
+    else {
+        return NO;
     }
 }
 
@@ -174,26 +195,29 @@
         [navController setToolbarHidden:YES animated:NO];
         [navController setNavigationBarHidden:NO];
         UIBarButtonItem *stopButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:discoveryController action:@selector(dismissView)];
-        navController.navigationItem.leftBarButtonItem = stopButton;
+        
+        discoveryController.navigationItem.leftBarButtonItem = stopButton;
 
         [self presentViewController:navController animated:YES completion:nil];
     }
     else if (indexPath.section == 4) {
         UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Delete Event" message:@"Are you sure that you want to delete this event?" preferredStyle:UIAlertControllerStyleAlert];
         UIAlertAction *deleteAction = [UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
-            NSString *eventName = self.event[@"name"];
+            NSString *eventName = self.entry[@"name"];
             HBPreferences *preferences = [[HBPreferences alloc] initWithIdentifier:@"com.haotestlabs.nfcactivator"];
             NSArray *entrys = [preferences objectForKey:@"NFCActivatorEntrys"];
 
             for (int i = 0; i < entrys.count; i++) {
                 if ([entrys[i][@"name"] isEqual:eventName]) {
-                    NSArray *updatedEntrys = [[[entrys mutableCopy] removeObjectAtIndex:i] copy];
-                    [preferences setObject:updatedEntrys forKey:@"NFCActivatorEntrys"];
+                    NSMutableArray *updatedEntrys = [entrys mutableCopy];
+                    [updatedEntrys removeObjectAtIndex:i];
+                    [preferences setObject:[updatedEntrys copy] forKey:@"NFCActivatorEntrys"];
                     break;
                 }
             }
 
-            // TODO: send notification
+            CFNotificationCenterRef center = CFNotificationCenterGetDarwinNotifyCenter();
+	        CFNotificationCenterPostNotification(center, CFSTR("com.haotestlabs.nfcactivator.reload"), NULL, NULL, TRUE);
 
             [self.navigationController popViewControllerAnimated:YES];
             if (self.delegate) {
@@ -206,6 +230,24 @@
         [self presentViewController:alert animated:YES completion:nil];
     }
 }
+- (UISwipeActionsConfiguration *)tableView:(UITableView *)tableView trailingSwipeActionsConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.section != 3) {
+        return nil;
+    }
+
+    UIContextualAction *deleteAction = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleDestructive title:@"delete" handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
+		NSMutableArray *tags = [self.entry[@"tags"] mutableCopy];
+        [tags removeObjectAtIndex:indexPath.row];
+        [self.entry setObject:tags forKey:@"tags"];
+
+        [self.tableView reloadData];
+
+		completionHandler(YES);
+	}];
+
+	UISwipeActionsConfiguration *config = [UISwipeActionsConfiguration configurationWithActions:@[deleteAction]];
+	return config;
+}
 
 #pragma mark UITextFieldDelegate
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
@@ -215,6 +257,7 @@
     else {
         [textField resignFirstResponder];
     }
+    return NO;
 }
 
 #pragma mark NAPViewDismissCallbackProtocol
