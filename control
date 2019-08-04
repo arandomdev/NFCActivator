@@ -1,9 +1,10 @@
 Package: com.haotestlabs.nfcactivator
 Name: NFCActivator
-Depends: mobilesubstrate, com.haotestlabs.nfcbackground, ws.hbang.common (>= 1.2)
-Version: 0.0.1
+Depends: mobilesubstrate, com.haotestlabs.nfcbackground, ws.hbang.common (>= 1.2), libactivator (>= 1.8.3)
+Version: 1.0.0-1
 Architecture: iphoneos-arm
-Description: An awesome MobileSubstrate tweak!
-Maintainer: ArandomDev <haow6449@gmail.com
-Author: ArandomDev <haow6449@gmail.com
+Description: Run activator actions by with a NFC tag.
+Maintainer: ArandomDev <haow6449@gmail.com>
+Author: ArandomDev <haow6449@gmail.com>
 Section: Tweaks
+Depiction: https://arandomdev.github.io/cydia/depictions/?p=com.haotestlabs.nfcactivator

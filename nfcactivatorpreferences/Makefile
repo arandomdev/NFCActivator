@@ -1,5 +1,5 @@
-THEOS_DEVICE_IP = haotestlabs.com
-THEOS_DEVICE_PORT = 28262
+DEBUG = 0
+FINALPACKAGE = 1
 
 ARCHS = arm64
 
