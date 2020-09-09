@@ -33,6 +33,13 @@ void detectedTags(CFNotificationCenterRef center, void *observer, CFStringRef na
     textLabel.text = @"Scan Now";
     textLabel.textAlignment = NSTextAlignmentCenter;
     textLabel.center = self.view.center;
+    if (@available(iOS 13.0, *)) {
+        if (self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+            textLabel.textColor = [UIColor blackColor];
+        }else {
+            textLabel.textColor = [UIColor whiteColor];
+        }
+    }
     [self.view addSubview:textLabel];
 }
 - (void)dismissView {
