@@ -1,7 +1,7 @@
 DEBUG = 0
 FINALPACKAGE = 1
 
-ARCHS = arm64
+ARCHS = arm64 arm64e
 
 include $(THEOS)/makefiles/common.mk
 
@@ -9,9 +9,10 @@ BUNDLE_NAME = NFCActivatorPreferences
 NFCActivatorPreferences_FILES = NAPRootViewController.m NAPEditViewController.mm NAPDiscoveryViewController.mm
 NFCActivatorPreferences_INSTALL_PATH = /Library/PreferenceBundles
 NFCActivatorPreferences_FRAMEWORKS = UIKit
-NFCActivatorPreferences_PRIVATE_FRAMEWORKS = Preferences
+NFCActivatorPreferences_PRIVATE_FRAMEWORKS = Preferences AppSupport
 NFCActivatorPreferences_CFLAGS = -fobjc-arc
 NFCActivatorPreferences_EXTRA_FRAMEWORKS = Cephei
+NFCActivatorPreferences_LIBRARIES = rocketbootstrap
 
 include $(THEOS_MAKE_PATH)/bundle.mk
 
